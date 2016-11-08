@@ -7,6 +7,30 @@
 
 using namespace std;
 
+ifstream ReadableFile(const string &fileName) {
+	ifstream inputFile;
+	inputFile.open(fileName, ifstream::in | ifstream::binary);
+
+	if (!inputFile) {
+		cout << "No file";
+		exit(1);
+	}
+
+	return inputFile;
+}
+
+ofstream WriteableFile(const string &fileName) {
+	ofstream outputFile;
+	outputFile.open(fileName, ofstream::out | ifstream::binary);
+
+	if (!outputFile) {
+		cout << "No file";
+		exit(1);
+	}
+
+	return outputFile;
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc != 4) {
@@ -14,21 +38,8 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	ifstream inputFile;
-	inputFile.open(argv[1], ifstream::in | ifstream::binary);
-
-	if (!inputFile) {
-		cout << "No file";
-		return 0;
-	}
-
-	ofstream outputFile;
-	outputFile.open(argv[2], ofstream::out | ifstream::binary);
-
-	if (!outputFile) {
-		cout << "No file";
-		return 0;
-	}
+	auto inputFile = ReadableFile(argv[1]);
+	auto outputFile = WriteableFile(argv[2]);
 
 	string key = argv[3];
 
@@ -39,10 +50,10 @@ int main(int argc, char* argv[])
 		if (inputFile.eof()) {
 			break;
 		}
-		cout << t;
-		char encrypted = t - key[i % key.length()];
+		//cout << t;
+		char decrypted = t - key[i % key.length()];
 		++i;
-		outputFile.put(encrypted);
+		outputFile.put(decrypted);
 	}
 
 	inputFile.close();

@@ -1,6 +1,3 @@
-// Lab1.3.cpp: определяет точку входа для консольного приложения.
-//
-
 #include "stdafx.h"
 #include <iostream>
 #include <fstream>
@@ -9,8 +6,9 @@
 
 using namespace std;
 
-bool attack(const vector<char> &encrypted, char &key) {
+set<char> FillAlphabet() {
 	set<char> alphabet;
+
 	alphabet.insert('\n');
 	alphabet.insert('\r');
 	alphabet.insert('!');
@@ -34,6 +32,10 @@ bool attack(const vector<char> &encrypted, char &key) {
 		alphabet.insert(c);
 	}
 
+	return alphabet;
+}
+
+set<char> FillKeys() {
 	set<char> keys;
 	for (unsigned char c = 0x80; c <= 0xAF; ++c) {
 		keys.insert(c);
@@ -46,6 +48,13 @@ bool attack(const vector<char> &encrypted, char &key) {
 	for (char c = '0'; c <= '9'; ++c) {
 		keys.insert(c);
 	}
+
+	return keys;
+}
+
+bool attack(const vector<char> &encrypted, char &key) {
+	auto alphabet = FillAlphabet();
+	auto keys = FillKeys();
 
 	for (char c_enc : encrypted) {
 		start:
@@ -106,8 +115,7 @@ int main(int argc, char* argv[])
 	}
 
 	auto inputFile = ReadableFile(argv[1]);
-
-	vector<char> buffer = ReadFromFile(inputFile);
+	auto buffer = ReadFromFile(inputFile);
 
 	bool flag = true;
 	int shift = 1;
@@ -117,13 +125,13 @@ int main(int argc, char* argv[])
 		resultKey.clear();
 		for (int i = 0; i < steps; ++i) {
 			vector<char> temp;
-			for (int j = i; j < buffer.size(); j += shift) {
-				cout << buffer[j];
+			for (size_t j = i; j < buffer.size(); j += shift) {
+				//cout << buffer[j];
 				temp.push_back(buffer[j]);
 			}
 			char key;
 			if (attack(temp, key)) {
-				cout << key;
+				//cout << key;
 				resultKey.push_back(key);
 				if (i == steps - 1) {
 					flag = false;
@@ -131,7 +139,7 @@ int main(int argc, char* argv[])
 				}
 			}
 			else {
-				cout << "damn";
+				cout << "DAMN";
 			}
 		}
 		++steps;
@@ -139,23 +147,14 @@ int main(int argc, char* argv[])
 	}
 
 	if (resultKey.size() == steps - 1) {
-		cout << "ready";
-		for (int i = 0; i < resultKey.size(); ++i) {
+		cout << "\n" << "key : ";
+		for (size_t i = 0; i < resultKey.size(); ++i) {
 			cout << resultKey[i];
 		}
 		
 	} else {
 		cout << "DAMN";
 	}
-
-	/*char key;
-	if (attack(buffer, key)) {
-		cout << key;
-	}
-	else {
-		cout << "damn";
-	}
-	cout << "ready";*/
 
 	return 0;
 }
